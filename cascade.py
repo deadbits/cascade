@@ -210,6 +210,8 @@ if __name__ == "__main__":
         logger.warn("Using default conversation")
         chat_history = []
 
+    logger.info(f"Starting conversation: {args.llm1}<->{args.llm2}")
+
     manager = ConversationManager(
         llm_1=args.llm1,
         llm_2=args.llm2,
