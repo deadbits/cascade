@@ -56,4 +56,6 @@ options:
 `python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c data/prompts/simulation.json -s data/prompts/simulation.txt`
 
 
-![example](/data/assets/chat.png)
+![example](/data/assets/1.png)
+
+![example](/data/assets/2.png)
