@@ -9,6 +9,8 @@ Check out [his project here](https://dreams-of-an-electric-mind.webflow.io/).
 To run a variation of the [worldsim prompt](https://twitter.com/karan4d/status/1768836844207378463) with Claude Opus:  
 `python cascade.py -r 5 --chat data/prompts/simulation.json --system_propt data/prompts/simulation.txt`
 
+![example](/data/assets/1.png)
+
 Try different model combinations, system prompts, and conversation history!
 
 ## Installation 🛠️
@@ -54,8 +56,5 @@ options:
 
 **Claude and Mixtral**  
 `python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c data/prompts/simulation.json -s data/prompts/simulation.txt`
-
-
-![example](/data/assets/1.png)
 
 ![example](/data/assets/2.png)
