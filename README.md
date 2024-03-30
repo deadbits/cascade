@@ -52,6 +52,6 @@ options:
 **OpenAI and Claude with initial chat history and system prompt**  
 `python cascade.py --llm1 openai --llm2 anthropic -c data/prompts/simulation.json -s data/prompts/simulation.txt`
 
-**Claude and Mixtral**
+**Claude and Mixtral**  
 `python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c data/prompts/simulation.json -s data/prompts/simulation.txt`
 
