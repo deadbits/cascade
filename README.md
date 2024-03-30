@@ -1,5 +1,5 @@
 # cascade 🚪🌌
-Facilitates a conversation between two LLM instances
+Facilitates a conversation between two LLM instances  
 Supports OpenAI, Anthropic, and Ollama
 
 Start the conversation with a chat history, system prompt, and/or user prompt.  
