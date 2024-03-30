@@ -1,66 +1,57 @@
-# endless 🚪🌌
-```
-˚. ✦.˳·˖✶ ⋆.✧̣̇˚.
-endless backrooms
-˚. ✦.˳·˖✶ ⋆.✧̣̇˚.
-```
-
-This project facilitates a conversation between two LLM instances (OpenAI, Anthropic, Ollama).
+# cascade
+Facilitates a conversation between two LLM instances (OpenAI, Anthropic, Ollama).
 
 Start the conversation with a chat history, system prompt, and user prompt.  
-The default settings will run a virtual CLI simulation between the two models.
 
 Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for the original code/idea and prompt.  
 Check out [his project here](https://dreams-of-an-electric-mind.webflow.io/).
 
+To run a variation of the [worldsim prompt](https://twitter.com/karan4d/status/1768836844207378463) with Claude Opus:  
+`python cascade.py -r 5 --chat data/prompts/simulation.json --system_propt data/prompts/simulation.txt`
+
+Try different model combinations, system prompts, and conversation history!
 
 ## Installation 🛠️
 ```
-git clone https://github.com/deadbits/endless.git
-cd endless
-pyenv virtualenv 3.11.7 endless
-pyenv activate endless
+git clone https://github.com/deadbits/cascade.git
+cd cascade
+pyenv virtualenv 3.11.7 cascade
+pyenv activate cascade
 pip install -r requirements.txt
 ```
 
 ## Usage 🚀
-Before running `endless.py`, set your Anthropic and OpenAI API keys using the environment variables `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`.
+Make sure Ollama is running if you are using it for inference and/or set your API keys using environment variables `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`
 
 ```
-usage: endless.py [-h] [--ai1 {anthropic,openai,ollama:*}] [--ai2 {anthropic,openai,ollama:*}] [-r ROUNDS] [-s SYSTEM_PROMPT]
-                   [-u USER_PROMPT] [-o OUTPUT]
-
-endless backrooms
+python cascade.py --help
+usage: cascade.py [-h] [--llm1 LLM1] [--llm2 LLM2] [-r ROUNDS] [-c CHAT] [-s SYSTEM_PROMPT] [-o OUTPUT]
 
 options:
   -h, --help            show this help message and exit
-  --ai1 {anthropic,openai,ollama:*}
-                        First LLM
-  --ai2 {anthropic,openai,ollama:*}
-                        Second LLM
+  --llm1 LLM1           First LLM (anthropic, openai, ollama:*)
+  --llm2 LLM2           Second LLM (anthropic, openai, ollama:*)
   -r ROUNDS, --rounds ROUNDS
                         Number of exchanges between the instances
+  -c CHAT, --chat CHAT  Initial chat history
   -s SYSTEM_PROMPT, --system_prompt SYSTEM_PROMPT
                         System prompt
-  -u USER_PROMPT, --user_prompt USER_PROMPT
-                        User prompt
   -o OUTPUT, --output OUTPUT
                         File to save conversation to
 ```
 
-## Examples 🌈
+* `--system_prompt` is passed to both LLMs
+* `--chat` takes a text file list of messages and uses it as history for `--llm1`
+* see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
+
+## Examples
 
 **Start a conversation between two Claude instances with 10 rounds:**  
-`python endless.py --rounds 10`
+`python cascade.py --rounds 10`
 
-**Use OpenAI for the first LLM and Anthropic for the second, running in supervised mode:**  
-`python endless.py --ai1 openai --ai2 anthropic --supervised`
+**OpenAI and Claude with initial chat history and system prompt**  
+`python cascade.py --llm1 openai --llm2 anthropic -c data/prompts/simulation.json -s data/prompts/simulation.txt`
 
-**Provide a user prompt to start the conversation and save the output to a file:**  
-`python endless.py --user_prompt "Explore the hidden depths of reality" --output conversation.json`
-
-## Prompts
-By default, the conversation starts with an initial chat history between the user and assistant that sets the stage for one LLM to act as a virtual CLI simulation and the other to act as the user of that simulation. 
-
-If you supply a `--user_prompt`, this is added to the initial conversation from the side of the virtual CLI simulation as `f"<OOC> Let's begin! {user_prompt}"`
+**Claude and Mixtral**
+`python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c data/prompts/simulation.json -s data/prompts/simulation.txt`
 

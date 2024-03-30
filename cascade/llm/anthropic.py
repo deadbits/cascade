@@ -16,9 +16,6 @@ class AnthropicWrapper:
     def generate(self, conversation, system_prompt=None):
         formatted = ""
 
-        if system_prompt:
-            conversation.insert(0, {"role": "system", "content": system_prompt})
-
         try:
             params = {
                 'model': 'claude-3-opus-20240229',
