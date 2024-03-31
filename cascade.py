@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import ValidationError
 
 from cascade.utils import create_panel, write_json
+from cascade.models import Conversation, Message
 from cascade.llm.anthropic import AnthropicWrapper
 from cascade.llm.openai import OpenAIWrapper
 from cascade.llm.ollama import OllamaWrapper
@@ -33,17 +34,19 @@ class ConversationManager:
         llm_1: str,
         llm_2: str,
         history: List[Dict[str, str]],
-        system_prompt: str, 
+        sys_prompt1: str,
+        sys_prompt2: str,
         rounds: int = 5,
         output_file: Optional[str] = None
     ) -> None:
         self.llm_1 = llm_1
         self.llm_2 = llm_2
         self.conv_1 = history
-        self.conv_2 = []
+        self.conv_2 = Conversation(messages=[])
         self.rounds = rounds
         self.output_file = output_file
-        self.system_prompt = system_prompt
+        self.sys_prompt1 = sys_prompt1
+        self.sys_prompt2 = sys_prompt2
         self.clients: Dict[str, Any] = {llm_1: None, llm_2: None}
 
         for llm in [self.llm_1, self.llm_2]:
@@ -66,8 +69,8 @@ class ConversationManager:
         if self.output_file:
             write_json(
                 {
-                    "conversation_1": self.conv_1,
-                    "conversation_2": self.conv_2
+                    "conversation_1": self.conv_1.model_dump(),
+                    "conversation_2": self.conv_2.model_dump()
                 }, 
                 self.output_file
             )
@@ -75,45 +78,29 @@ class ConversationManager:
     def _converse(self) -> None:
         for i in range(1, self.rounds + 1):
             sequence = [
-                (self.conv_1, self.llm_1, self.conv_2),
-                (self.conv_2, self.llm_2, self.conv_1)
+                (self.conv_1, self.llm_1, self.sys_prompt1, self.conv_2),
+                (self.conv_2, self.llm_2, self.sys_prompt2, self.conv_1)
             ]
 
-            for conv, llm, other_conv in sequence:
-                response = self._generate_response(conv, llm, system=True, round_num=i)
-                conv.append(
-                    {
-                        "role": "assistant", 
-                        "content": response
-                    }
-                )
-                other_conv.append(
-                    {
-                        "role": "user",
-                        "content": response
-                    }
-                )
+            for conv, llm, sys_prompt, other_conv in sequence:
+                response = self._generate_response(conv, llm, sys_prompt, round_num=i)
+                new_message = Message(role="assistant", content=response)
+                conv.messages.append(new_message)
+
+                other_conv_new_message = Message(role="user", content=response)
+                other_conv.messages.append(other_conv_new_message)
                 time.sleep(2)
 
-    def _generate_response(self, conversation: List[Dict[str, str]], bot_name: str, system: bool, round_num: int) -> str:
+    def _generate_response(self, conversation: Conversation, bot_name: str, sys_prompt: str, round_num: int) -> str:
         spinner = Halo(text='Loading...', spinner='dots')
         spinner.text = f"(#r{round_num}) {bot_name} loading..."
         spinner.start()
         response = ""
 
         try:
-            conversation = [
-                {"role": msg["role"], 
-                "content": msg["content"]} for msg in conversation
-            ]
-        except Exception as e:
-            spinner.fail("Failed")
-            console.print_exception()
-            sys.exit(1)
-
-        try:
-            response = self.clients[bot_name].generate(conversation, system_prompt)
-            spinner.succeed(f"(#r{round_num}) {bot_name} done")
+            response = self.clients[bot_name].generate(conversation.messages, sys_prompt)
+            spinner.stop()
+            spinner.clear()
 
             panel = create_panel(
                     response,
@@ -124,12 +111,11 @@ class ConversationManager:
             console.print(panel)
 
         except Exception as e:
-            print(f"Error generating response: {str(e)}")
+            logger.error(f"Error generating response: {str(e)}")
             spinner.fail("Failed")
             console.print_exception()
             sys.exit(1)
 
-        spinner.stop()
         return response
 
 
@@ -151,6 +137,22 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "-s1",
+        "--sys_prompt1",
+        action="store",
+        default="data/prompts/simulation.txt",
+        help="Path to system prompt for LLM 1"
+    )
+
+    parser.add_argument(
+        "-s2",
+        "--sys_prompt2",
+        action="store",
+        default="data/prompts/pirate.txt",
+        help="Path to system prompt for LLM2"
+    )
+
+    parser.add_argument(
         "-r",
         "--rounds",
         type=int,
@@ -163,15 +165,7 @@ if __name__ == "__main__":
         "--chat",
         type=str,
         default="",
-        help="Initial chat history"
-    )
-
-    parser.add_argument(
-        "-s",
-        "--system_prompt",
-        action="store",
-        default="data/prompts/simulation.txt",
-        help="System prompt"
+        help="Path to initial chat history"
     )
 
     parser.add_argument(
@@ -185,44 +179,47 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.system_prompt):
-        logger.error(f"System prompt file not found: {args.system_prompt}")
+    if not os.path.exists(args.sys_prompt1) or not os.path.exists(args.sys_prompt2):
+        logger.error("System prompt file not found")
         sys.exit(1)
+
+    with open(args.sys_prompt1, "r") as file:
+        system_prompt1 = file.read()
     
-    with open(args.system_prompt, "r") as file:
-        system_prompt = file.read()
+    with open(args.sys_prompt2, "r") as file:
+        system_prompt2 = file.read()
 
     if args.chat and os.path.exists(args.chat):
-        with open(args.chat, "r") as fp:
-            try:
+        try:
+            with open(args.chat, "r") as fp:
                 data = json.load(fp)
-                try:
-                    if isinstance(data, list):
-                        chat_history = data
-                except ValidationError as e:
-                    logger.error(f"Invalid chat history: {e}")
-                    sys.exit(1)
-            except json.JSONDecodeError as e:
-                logger.error(f"Error loading chat history: {e}")
-                sys.exit(1)
-
+                chat_history = Conversation(messages=data)
+        except json.JSONDecodeError as e:
+            logger.error(f"Error loading chat history: {e}")
+            sys.exit(1)
+        except ValidationError as e:
+            logger.error(f"Invalid chat history structure: {e}")
+            sys.exit(1)
     else:
-        logger.warn("Using default conversation")
-        chat_history = []
+        chat_history = Conversation(messages=[])
 
-    logger.info(f"Starting conversation: {args.llm1}<->{args.llm2}")
+    logger.info(f"Starting conversation: {args.llm1} ⇄ {args.llm2}")
 
     manager = ConversationManager(
         llm_1=args.llm1,
         llm_2=args.llm2,
         history=chat_history,
-        system_prompt=system_prompt,
+        sys_prompt1=system_prompt1,
+        sys_prompt2=system_prompt2,
         rounds=args.rounds,
         output_file=args.output,
     )
 
     try:
         manager.converse()
+    except KeyboardInterrupt:
+        logger.error("Conversation interrupted by user")
+        sys.exit(1)
     except Exception as e:
         print(f"An error occurred: {e}")
         sys.exit(1)
