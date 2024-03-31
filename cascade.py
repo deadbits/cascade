@@ -137,18 +137,18 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-s1",
-        "--sys_prompt1",
+        "--sys1",
+        type=str,
         action="store",
-        default="data/prompts/simulation.txt",
+        required=True,
         help="Path to system prompt for LLM 1"
     )
 
     parser.add_argument(
-        "-s2",
-        "--sys_prompt2",
+        "--sys2",
+        type=str,
         action="store",
-        default="data/prompts/pirate.txt",
+        required=True,
         help="Path to system prompt for LLM2"
     )
 
@@ -164,7 +164,7 @@ if __name__ == "__main__":
         "-c",
         "--chat",
         type=str,
-        default="",
+        required=True,
         help="Path to initial chat history"
     )
 
@@ -179,17 +179,21 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.sys_prompt1) or not os.path.exists(args.sys_prompt2):
-        logger.error("System prompt file not found")
+    try:
+        with open(args.sys1, "r") as file:
+            system_prompt1 = file.read()
+    except Exception as e:
+        logger.error(f"Error loading system prompt: {e}")
         sys.exit(1)
 
-    with open(args.sys_prompt1, "r") as file:
-        system_prompt1 = file.read()
-    
-    with open(args.sys_prompt2, "r") as file:
-        system_prompt2 = file.read()
+    try:
+        with open(args.sys2, "r") as file:
+            system_prompt2 = file.read()
+    except Exception as e:
+        logger.error(f"Error loading system prompt: {e}")
+        sys.exit(1)
 
-    if args.chat and os.path.exists(args.chat):
+    if os.path.exists(args.chat):
         try:
             with open(args.chat, "r") as fp:
                 data = json.load(fp)
@@ -200,8 +204,6 @@ if __name__ == "__main__":
         except ValidationError as e:
             logger.error(f"Invalid chat history structure: {e}")
             sys.exit(1)
-    else:
-        chat_history = Conversation(messages=[])
 
     logger.info(f"Starting conversation: {args.llm1} ⇄ {args.llm2}")
 
