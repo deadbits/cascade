@@ -20,16 +20,14 @@ pip install -r requirements.txt
 ## Usage 🚀
 
 ```
-usage: cascade.py [-h] [--llm1 LLM1] [--llm2 LLM2] [-s1 SYS_PROMPT1] [-s2 SYS_PROMPT2] [-r ROUNDS] [-c CHAT] [-o OUTPUT]
+usage: cascade.py [-h] [--llm1 LLM1] [--llm2 LLM2] --sys1 SYS1 --sys2 SYS2 [-r ROUNDS] -c CHAT [-o OUTPUT]
 
 options:
   -h, --help            show this help message and exit
   --llm1 LLM1           First LLM (anthropic, openai, ollama:*)
   --llm2 LLM2           Second LLM (anthropic, openai, ollama:*)
-  -s1 SYS_PROMPT1, --sys_prompt1 SYS_PROMPT1
-                        Path to system prompt for LLM 1
-  -s2 SYS_PROMPT2, --sys_prompt2 SYS_PROMPT2
-                        Path to system prompt for LLM2
+  --sys1 SYS1           Path to system prompt for LLM 1
+  --sys2 SYS2           Path to system prompt for LLM2
   -r ROUNDS, --rounds ROUNDS
                         Number of exchanges between the instances
   -c CHAT, --chat CHAT  Path to initial chat history
