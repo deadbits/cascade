@@ -1,8 +1,6 @@
 # cascade
 Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama)
 
-Start the conversation with a chat history and system prompts. 
-
 ![example](/data/assets/1.png)
 
 Try different model combinations, system prompts, and conversation history!
