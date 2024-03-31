@@ -3,8 +3,6 @@ Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama)
 
 Try different model combinations, system prompts, and conversation history!
 
-***  
-
 ![example](/data/assets/1.png)
 
 ## Installation 🛠️
