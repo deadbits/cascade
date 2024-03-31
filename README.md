@@ -24,6 +24,9 @@ pip install -r requirements.txt
 * `--chat` takes a text file list of messages and uses it as history for `--llm1`
 * see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
 
+* `--chat` takes a text file list of messages and uses it as history for `--llm1`
+* see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
+
 ```
 usage: cascade.py [-h] [--llm1 LLM1] [--llm2 LLM2] [-s1 SYS_PROMPT1] [-s2 SYS_PROMPT2] [-r ROUNDS] [-c CHAT] [-o OUTPUT]
 
@@ -52,8 +55,6 @@ options:
 
 **Claude and Mixtral**  
 `python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c data/prompts/simulation.json -s1 data/prompts/simulation.txt -s2 data/prompts/simulation.txt`
-
-![example](/data/assets/2.png)
 
 
 ## Credit
