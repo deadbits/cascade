@@ -21,12 +21,6 @@ pip install -r requirements.txt
 
 ## Usage 🚀
 
-* `--chat` takes a text file list of messages and uses it as history for `--llm1`
-* see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
-
-* `--chat` takes a text file list of messages and uses it as history for `--llm1`
-* see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
-
 ```
 usage: cascade.py [-h] [--llm1 LLM1] [--llm2 LLM2] [-s1 SYS_PROMPT1] [-s2 SYS_PROMPT2] [-r ROUNDS] [-c CHAT] [-o OUTPUT]
 
@@ -45,18 +39,25 @@ options:
                         File to save conversation to
 ```
 
+* `--chat` takes a text file list of messages and uses it as history for `--llm1`
+* see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
+
+
 ## Examples
 
 **Start a conversation between two Claude instances with 10 rounds**  
 `python cascade.py --rounds 10`
 
-**Run a variation of the [worldsim prompt](https://twitter.com/karan4d/status/1768836844207378463) with Anthropic and OpenAI**  
+**Run a [virtual CLI simulation](https://twitter.com/AndyAyrey/status/1769942282168664104) between Anthropic and OpenAI**  
 `python cascade.py --llm1 anthropic --llm2 openai -c data/prompts/simulation.json -s1 data/prompts/simulation.txt -s2 data/prompts/simulation.txt`
 
 **Claude and Mixtral**  
 `python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c data/prompts/simulation.json -s1 data/prompts/simulation.txt -s2 data/prompts/simulation.txt`
 
+**Virtual CLI simulation with one LLM responding like a pirate**
+`python cascade.py --llm1 anthropic --llm2 anthropic -c data/prompts/simulation.json -s1 data/prompts/simulation.txt -s2 data/prompts/pirate.txt`
+
 
 ## Credit
-Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for the [original code and prompt](https://www.codedump.xyz/py/ZfkQmMk8I7ecLbIk).  
+Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for inspiration and [original code and prompt](https://www.codedump.xyz/py/ZfkQmMk8I7ecLbIk).  
 Check out [his project here](https://dreams-of-an-electric-mind.webflow.io/).
