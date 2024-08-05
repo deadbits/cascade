@@ -25,6 +25,7 @@ class Config(BaseModel):
     output_file: str
     history: Optional[List[Dict[str, str]]] = None
     history_file: Optional[str] = None
+    human_in_the_loop: bool = False
 
     @model_validator(mode='after')
     def check_history(cls, values):
