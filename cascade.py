@@ -36,16 +36,34 @@ class ConversationManager:
         self.llm_2 = conf.llm2.type
         self.rounds = conf.rounds
         self.output_file = conf.output_file
+        self.hitl = conf.human_in_the_loop
+        if self.hitl:
+            logger.warning(
+                "Human-in-the-loop mode enabled. Press Ctrl+C on your input to skip a round."
+            )
 
-        with open(conf.llm1.system_prompt_file, 'r', encoding='utf-8') as f:
-            self.sys_prompt1 = f.read()
+        try:
+            with open(conf.llm1.system_prompt_file, 'r', encoding='utf-8') as f:
+                self.sys_prompt1 = f.read()
+        except FileNotFoundError:
+            logger.error(f"System prompt file not found: {conf.llm1.system_prompt_file}")
+            sys.exit(1)
 
-        with open(conf.llm2.system_prompt_file, 'r', encoding='utf-8') as f:
-            self.sys_prompt2 = f.read()
+        try:
+            with open(conf.llm2.system_prompt_file, 'r', encoding='utf-8') as f:
+                self.sys_prompt2 = f.read()
+        except FileNotFoundError:
+            logger.error(f"System prompt file not found: {conf.llm2.system_prompt_file}")
+            sys.exit(1)
 
         if conf.history_file:
-            with open(conf.history_file, 'r', encoding='utf-8') as f:
-                self.conv_1 = Conversation(messages=json.load(f))
+            try:
+                with open(conf.history_file, 'r', encoding='utf-8') as f:
+                    self.conv_1 = Conversation(messages=json.load(f))
+            except FileNotFoundError:
+                logger.error(f"History file not found: {conf.history_file}")
+                sys.exit(1)
+
         elif conf.history:
             self.conv_1 = Conversation(messages=conf.history)
         else:
@@ -91,6 +109,14 @@ class ConversationManager:
             ]
 
             for conv, llm, sys_prompt, other_conv in sequence:
+                if self.hitl:
+                    try:
+                        # add a human message to the last prompt of the conversation
+                        human_message = input(f"msg ({llm}): ").strip()
+                        conv.messages[-1].content += f"\n\n<HUMAN>{human_message}</HUMAN>\n"
+                    except KeyboardInterrupt:
+                        logger.debug("User skipped message")
+
                 response = self._generate_response(conv, llm, sys_prompt, round_num=i)
                 new_message = Message(role="assistant", content=response)
                 conv.messages.append(new_message)
