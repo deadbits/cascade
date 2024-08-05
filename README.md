@@ -18,12 +18,12 @@ pip install -r requirements.txt
 The application now uses a YAML configuration file for easier setup and reusability.
 
 ```bash
-python main.py --config path/to/config.yaml
+python main.py --config data/config.yaml
 ```
 
 ### YAML Configuration
 
-Modify the YAML config file `data/config.yaml` or create your own with the following structure:
+Modify the config file `data/config.yaml` or create your own with the following structure:
 
 ```yaml
 # LLM type options: anthropic, openai, ollama:*
