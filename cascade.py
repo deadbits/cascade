@@ -7,6 +7,7 @@ start a conversation between two LLM instances
 
 set api keys with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`
 """
+import os
 import json
 import sys
 import time
@@ -29,41 +30,47 @@ from cascade.llm.ollama import OllamaWrapper
 console = Console()
 
 
+
 class ConversationManager:
     """Manage a conversation between two language models."""
-    def __init__(self, conf: Config) -> None:
+    def __init__(self, conf: Config, conf_dir: str) -> None:
         self.llm_1 = conf.llm1.type
         self.llm_2 = conf.llm2.type
         self.rounds = conf.rounds
-        self.output_file = conf.output_file
+        self.output_file = os.path.join(conf_dir, conf.output_file) if conf.output_file else None
         self.hitl = conf.human_in_the_loop
+        self.output_data = {"conversation_1": [], "conversation_2": []}
+
         if self.hitl:
             logger.warning(
                 "Human-in-the-loop mode enabled. Press Ctrl+C on your input to skip a round."
             )
 
         try:
-            with open(conf.llm1.system_prompt_file, 'r', encoding='utf-8') as f:
-                self.sys_prompt1 = f.read()
+            with open(
+                os.path.join(conf_dir, conf.llm1.system_prompt_file), 'r', encoding='utf-8'
+            ) as fp:
+                self.sys_prompt1 = fp.read()
         except FileNotFoundError:
             logger.error(f"System prompt file not found: {conf.llm1.system_prompt_file}")
             sys.exit(1)
 
         try:
-            with open(conf.llm2.system_prompt_file, 'r', encoding='utf-8') as f:
-                self.sys_prompt2 = f.read()
+            with open(
+                os.path.join(conf_dir, conf.llm2.system_prompt_file), 'r', encoding='utf-8'
+            ) as fp:
+                self.sys_prompt2 = fp.read()
         except FileNotFoundError:
             logger.error(f"System prompt file not found: {conf.llm2.system_prompt_file}")
             sys.exit(1)
 
         if conf.history_file:
             try:
-                with open(conf.history_file, 'r', encoding='utf-8') as f:
-                    self.conv_1 = Conversation(messages=json.load(f))
+                with open(os.path.join(conf_dir, conf.history_file), 'r', encoding='utf-8') as fp:
+                    self.conv_1 = Conversation(messages=json.load(fp))
             except FileNotFoundError:
                 logger.error(f"History file not found: {conf.history_file}")
                 sys.exit(1)
-
         elif conf.history:
             self.conv_1 = Conversation(messages=conf.history)
         else:
@@ -88,41 +95,45 @@ class ConversationManager:
                     logger.error(f"Invalid Ollama model name (use format `ollama:model`): {llm}")
                     sys.exit(1)
 
+    def _append_and_write_message(self, conv_key: str, message: Message) -> None:
+        """Append a message to the output data and write it to the file."""
+        self.output_data[conv_key].append(message.model_dump())
+        if self.output_file:
+            with open(self.output_file, 'w', encoding='utf-8') as f:
+                json.dump(self.output_data, f, indent=2)
+
     def converse(self) -> None:
         """Start the conversation between the two instances."""
         self._converse()
 
-        if self.output_file:
-            write_json(
-                {
-                    "conversation_1": self.conv_1.model_dump(),
-                    "conversation_2": self.conv_2.model_dump(),
-                },
-                self.output_file,
-            )
-
     def _converse(self) -> None:
         for i in range(1, self.rounds + 1):
             sequence = [
-                (self.conv_1, self.llm_1, self.sys_prompt1, self.conv_2),
-                (self.conv_2, self.llm_2, self.sys_prompt2, self.conv_1),
+                (self.conv_1, self.llm_1, self.sys_prompt1, self.conv_2, "conversation_1"),
+                (self.conv_2, self.llm_2, self.sys_prompt2, self.conv_1, "conversation_2"),
             ]
 
-            for conv, llm, sys_prompt, other_conv in sequence:
+            for conv, llm, sys_prompt, other_conv, conv_key in sequence:
                 if self.hitl:
                     try:
-                        # add a human message to the last prompt of the conversation
                         human_message = input(f"msg ({llm}): ").strip()
                         conv.messages[-1].content += f"\n\n<HUMAN>{human_message}</HUMAN>\n"
+                        self._append_and_write_message(conv_key, conv.messages[-1])
                     except KeyboardInterrupt:
                         logger.debug("User skipped message")
 
                 response = self._generate_response(conv, llm, sys_prompt, round_num=i)
                 new_message = Message(role="assistant", content=response)
                 conv.messages.append(new_message)
+                self._append_and_write_message(conv_key, new_message)
 
                 other_conv_new_message = Message(role="user", content=response)
                 other_conv.messages.append(other_conv_new_message)
+                self._append_and_write_message(
+                    "conversation_2" if conv_key == "conversation_1" else "conversation_1",
+                    other_conv_new_message
+                )
+
                 time.sleep(2)
 
     def _generate_response(
@@ -160,13 +171,15 @@ class ConversationManager:
         return response
 
 
-def load_config(config_file: str) -> Config:
-    """Load the configuration from a YAML file."""
+def load_config(config_file: str) -> tuple[Config, str]:
+    """Load the configuration from a YAML file and return the config directory."""
+    config_dir = os.path.dirname(os.path.abspath(config_file))
+
     with open(config_file, 'r', encoding='utf-8') as f:
         config_data = yaml.safe_load(f)
 
     try:
-        return Config(**config_data)
+        return Config(**config_data), config_dir
     except ValidationError as validation_err:
         logger.error(f"Invalid configuration: {validation_err}")
         sys.exit(1)
@@ -183,11 +196,11 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    config = load_config(args.config)
+    config, config_dir = load_config(args.config)
 
     logger.info(f"Starting conversation: {config.llm1.type} ⇄ {config.llm2.type}")
 
-    manager = ConversationManager(config)
+    manager = ConversationManager(config, config_dir)
 
     try:
         manager.converse()

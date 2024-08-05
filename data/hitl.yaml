@@ -1,11 +1,11 @@
 # LLM type options: anthropic, openai, ollama:*
 llm1:
   type: anthropic
-  system_prompt_file: prompts/simulation.txt
+  system_prompt_file: prompts/guided-chat.txt
 
 llm2:
   type: openai
-  system_prompt_file: prompts/simulation.txt
+  system_prompt_file: prompts/guided-chat.txt
 
 # Conversation Settings
 rounds: 20

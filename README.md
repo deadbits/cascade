@@ -1,10 +1,6 @@
 # cascade
 Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama) and an optional human-in-the-loop
 
-Try different model combinations, system prompts, and conversation history!
-
-![example](/data/assets/1.png)
-
 ## Installation 🛠️
 ```bash
 git clone https://github.com/deadbits/cascade.git
@@ -27,7 +23,7 @@ python main.py --config path/to/config.yaml
 
 ### YAML Configuration
 
-Modify the YAML config file data/config.yaml or create your own with the following structure:
+Modify the YAML config file `data/config.yaml` or create your own with the following structure:
 
 ```yaml
 # LLM type options: anthropic, openai, ollama:*
@@ -46,7 +42,7 @@ output_file: path/to/output.json
 # Conversation history in JSON format
 history_file: path/to/conversation_history.json
 
-# Optional human in chat
+# Optional added to chat with <HUMAN> tag
 human_in_the_loop: False
 
 # Or conversation history in YAML format
@@ -61,6 +57,17 @@ human_in_the_loop: False
 * `history_file` takes a JSON file containing the conversation history
 * For an example conversation history, see [data/prompts/simulation.json](data/prompts/simulation.json)
 * You can optionally specify a short conversation history directly in the YAML file using the `history` key
+
+**Human-in-the-loop**
+When running in this mode, you'll see `msg ($LLM_NAME): ` in between messages sent to/from the LLMs.
+You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
+
+If you add a message, it'll be appended with the format below. 
+**It is up to you to use a system prompt or conversation history that handles this appropriately.**
+
+```xml
+<HUMAN>your message</HUMAN>
+```
 
 ## Examples
 
@@ -91,21 +98,13 @@ history_file: data/prompts/simulation.json
 ```
 
 **Chat with human-in-the-loop**
-When running in this mode, you'll see the prompt `msg ($LLM_NAME):` in between messages sent to/from the LLMs.
-You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
-
-If you add a message, it'll be appended with the format below. **It is up to you to use a prompt that handles this appropriately.**
-```xml
-<HUMAN>your message</HUMAN>
-```
-
 ```yaml
 llm1:
   type: anthropic
-  system_prompt_file: data/prompts/simulation.txt
+  system_prompt_file: data/prompts/guided-chat.txt
 llm2:
   type: anthropic
-  system_prompt_file: data/prompts/pirate.txt
+  system_prompt_file: data/prompts/guided-chat.txt
 rounds: 5
 output_file: output.json
 history_file: data/prompts/simulation.json
