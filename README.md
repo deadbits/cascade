@@ -59,6 +59,7 @@ human_in_the_loop: False
 * You can optionally specify a short conversation history directly in the YAML file using the `history` key
 
 **Human-in-the-loop**
+
 When running in this mode, you'll see `msg ($LLM_NAME): ` in between messages sent to/from the LLMs.
 You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
 
