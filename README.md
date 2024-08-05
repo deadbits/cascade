@@ -6,7 +6,7 @@ Try different model combinations, system prompts, and conversation history!
 ![example](/data/assets/1.png)
 
 ## Installation 🛠️
-```
+```bash
 git clone https://github.com/deadbits/cascade.git
 cd cascade
 pyenv virtualenv 3.11.7 cascade
@@ -19,37 +19,86 @@ pip install -r requirements.txt
 
 ## Usage 🚀
 
-```
-usage: cascade.py [-h] [--llm1 LLM1] [--llm2 LLM2] [-s1 SYS_PROMPT1] [-s2 SYS_PROMPT2] [-r ROUNDS] [-c CHAT] [-o OUTPUT]
+The application now uses a YAML configuration file for easier setup and reusability.
 
-options:
-  -h, --help            show this help message and exit
-  --llm1 LLM1           First LLM (anthropic, openai, ollama:*)
-  --llm2 LLM2           Second LLM (anthropic, openai, ollama:*)
-  -s1 SYS_PROMPT1, --sys_prompt1 SYS_PROMPT1
-                        Path to system prompt for LLM 1
-  -s2 SYS_PROMPT2, --sys_prompt2 SYS_PROMPT2
-                        Path to system prompt for LLM2
-  -r ROUNDS, --rounds ROUNDS
-                        Number of exchanges between the instances
-  -c CHAT, --chat CHAT  Path to initial chat history
-  -o OUTPUT, --output OUTPUT
-                        File to save conversation to
+```bash
+python main.py --config path/to/config.yaml
 ```
 
-* `--chat` takes a text file list of messages and uses it as history for `--llm1`
-* see [data/prompts/simulation.json](data/prompts/simulation.json) for an example conversation
+### YAML Configuration
+
+Create a YAML file with the following structure:
+
+```yaml
+# LLM type options: anthropic, openai, ollama:*
+llm1:
+  type: anthropic
+  system_prompt_file: path/to/system_prompt1.txt
+
+llm2:
+  type: openai
+  system_prompt_file: path/to/system_prompt2.txt
+
+# Conversation Settings
+rounds: 5
+output_file: path/to/output.json
+
+# Conversation history in JSON format
+history_file: path/to/conversation_history.json
+
+# Or conversation history in YAML format
+# Better for short conversations / quick tests
+# history:
+#  - role: user
+#    content: "Hello, how are you?"
+#  - role: assistant
+#    content: "I'm doing well, thank you for asking. How can I assist you today?"
+```
+
+* `history_file` takes a JSON file containing the conversation history
+* For an example conversation history, see [data/prompts/simulation.json](data/prompts/simulation.json)
+* You can optionally specify a short conversation history directly in the YAML file using the `history` key
 
 ## Examples
 
 **Claude and Mixtral**  
-`python cascade.py --llm1 anthropic --llm2 ollama:dolphin-mixtral -c chat.json -s1 prompt.txt -s2 prompt.txt`
+```yaml
+llm1:
+  type: anthropic
+  system_prompt_file: path/to/prompt.txt
+llm2:
+  type: ollama:dolphin-mixtral
+  system_prompt_file: path/to/prompt.txt
+rounds: 5
+output_file: output.json
+history_file: path/to/chat.json
+```
 
 **Run a [virtual CLI simulation](https://twitter.com/AndyAyrey/status/1769942282168664104) between Anthropic and OpenAI**  
-`python cascade.py --llm1 anthropic --llm2 openai -c data/prompts/simulation.json -s1 data/prompts/simulation.txt -s2 data/prompts/simulation.txt`
+```yaml
+llm1:
+  type: anthropic
+  system_prompt_file: data/prompts/simulation.txt
+llm2:
+  type: openai
+  system_prompt_file: data/prompts/simulation.txt
+rounds: 5
+output_file: output.json
+history_file: data/prompts/simulation.json
+```
 
 **Virtual CLI simulation with one LLM responding like a pirate**
-`python cascade.py --llm1 anthropic --llm2 anthropic -c data/prompts/simulation.json -s1 data/prompts/simulation.txt -s2 data/prompts/pirate.txt`
+```yaml
+llm1:
+  type: anthropic
+  system_prompt_file: data/prompts/simulation.txt
+llm2:
+  type: anthropic
+  system_prompt_file: data/prompts/pirate.txt
+rounds: 5
+output_file: output.json
+history_file: data/prompts/simulation.json
+```
 
 ## Credit
 Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for inspiration and [original code and prompt](https://www.codedump.xyz/py/ZfkQmMk8I7ecLbIk).  
