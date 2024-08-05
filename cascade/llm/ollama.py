@@ -1,13 +1,16 @@
+"""Wrapper for the Ollama API."""
 import ollama
 
 from cascade.utils import escape_chars
 
 
 class OllamaWrapper:
+    """Wrapper for the Ollama API."""
     def __init__(self, model_name: str) -> None:
         self.model_name = model_name
 
     def generate(self, conversation, system_prompt=None):
+        """Generate a response."""
         formatted = ""
 
         if system_prompt:

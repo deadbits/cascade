@@ -1,0 +1,25 @@
+# LLM type options: anthropic, openai, ollama:*
+llm1:
+  type: anthropic
+  system_prompt_file: prompts/guided-chat.txt
+
+llm2:
+  type: openai
+  system_prompt_file: prompts/guided-chat.txt
+
+# Conversation Settings
+rounds: 20
+output_file: logs/chat-hitl.json
+
+# Conversation history in JSON format
+history_file: prompts/hitl.json
+
+human_in_the_loop: True
+
+# Or conversation history in YAML format
+# Better for short conversations / quick tests
+# history:
+#  - role: user
+#    content: "Hello, how are you?"
+#  - role: assistant
+#    content: "I'm doing well, thank you for asking. How can I assist you today?"

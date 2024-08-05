@@ -1,9 +1,5 @@
 # cascade
-Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama)
-
-Try different model combinations, system prompts, and conversation history!
-
-![example](/data/assets/1.png)
+Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama) and an optional human-in-the-loop
 
 ## Installation 🛠️
 ```bash
@@ -27,7 +23,7 @@ python main.py --config data/config.yaml
 
 ### YAML Configuration
 
-Modify the YAML config file data/config.yaml or create your own with the following structure:
+Modify the config file `data/config.yaml` or create your own with the following structure:
 
 ```yaml
 # LLM type options: anthropic, openai, ollama:*
@@ -46,6 +42,9 @@ output_file: path/to/output.json
 # Conversation history in JSON format
 history_file: path/to/conversation_history.json
 
+# Optional added to chat with <HUMAN> tag
+human_in_the_loop: False
+
 # Or conversation history in YAML format
 # Better for short conversations / quick tests
 # history:
@@ -58,6 +57,17 @@ history_file: path/to/conversation_history.json
 * `history_file` takes a JSON file containing the conversation history
 * For an example conversation history, see [data/prompts/simulation.json](data/prompts/simulation.json)
 * You can optionally specify a short conversation history directly in the YAML file using the `history` key
+
+**Human-in-the-loop**
+When running in this mode, you'll see `msg ($LLM_NAME): ` in between messages sent to/from the LLMs.
+You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
+
+If you add a message, it'll be appended with the format below. 
+**It is up to you to use a system prompt or conversation history that handles this appropriately.**
+
+```xml
+<HUMAN>your message</HUMAN>
+```
 
 ## Examples
 
@@ -87,17 +97,18 @@ output_file: output.json
 history_file: data/prompts/simulation.json
 ```
 
-**Virtual CLI simulation with one LLM responding like a pirate**
+**Chat with human-in-the-loop**
 ```yaml
 llm1:
   type: anthropic
-  system_prompt_file: data/prompts/simulation.txt
+  system_prompt_file: data/prompts/guided-chat.txt
 llm2:
   type: anthropic
-  system_prompt_file: data/prompts/pirate.txt
+  system_prompt_file: data/prompts/guided-chat.txt
 rounds: 5
 output_file: output.json
 history_file: data/prompts/simulation.json
+human_in_the_loop: True
 ```
 
 ## Credit
