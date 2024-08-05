@@ -7,7 +7,7 @@ llm2:
   type: openai
   system_prompt_file: prompts/simulation.txt
 
-# Conversation Settings
+# Conversation settings
 rounds: 5
 output_file: logs/chat.json
 
