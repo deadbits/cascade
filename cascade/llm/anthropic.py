@@ -1,3 +1,4 @@
+"""Wrapper for the Anthropic API."""
 import os
 import anthropic
 
@@ -5,15 +6,18 @@ from cascade.utils import escape_chars
 
 
 class AnthropicWrapper:
+    """Wrapper for the Anthropic API."""
     def __init__(self):
         self.client = self.initialize_client()
 
     def initialize_client(self) -> anthropic.Anthropic:
+        """Initialize the Anthropic client."""
         if os.environ.get('ANTHROPIC_API_KEY'):
             return anthropic.Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY'))
-        raise Exception("Anthropic API key not found")
+        raise ValueError("Anthropic API key not found")
 
     def generate(self, conversation, system_prompt=None):
+        """Generate a response."""
         formatted = ""
 
         try:

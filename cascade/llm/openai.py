@@ -1,3 +1,4 @@
+"""Wrapper for OpenAI API"""
 import os
 
 from openai import OpenAI
@@ -6,15 +7,18 @@ from cascade.utils import escape_chars
 
 
 class OpenAIWrapper:
+    """Wrapper for OpenAI API"""
     def __init__(self):
         self.client = self.initialize_client()
 
     def initialize_client(self) -> OpenAI:
+        """Initialize the OpenAI client"""
         if os.environ.get('OPENAI_API_KEY'):
             return OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         raise Exception("OpenAI API key not found")
 
     def generate(self, conversation, system_prompt=None):
+        """Generate a response."""
         formatted = ""
 
         if system_prompt:
