@@ -1,5 +1,5 @@
 # cascade
-Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama)
+Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama) and an optional human-in-the-loop
 
 Try different model combinations, system prompts, and conversation history!
 
@@ -46,6 +46,9 @@ output_file: path/to/output.json
 # Conversation history in JSON format
 history_file: path/to/conversation_history.json
 
+# Optional human in chat
+human_in_the_loop: False
+
 # Or conversation history in YAML format
 # Better for short conversations / quick tests
 # history:
@@ -87,7 +90,15 @@ output_file: output.json
 history_file: data/prompts/simulation.json
 ```
 
-**Virtual CLI simulation with one LLM responding like a pirate**
+**Chat with human-in-the-loop**
+When running in this mode, you'll see the prompt `msg ($LLM_NAME):` in between messages sent to/from the LLMs.
+You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
+
+If you add a message, it'll be appended with the format below. **It is up to you to use a prompt that handles this appropriately.**
+```xml
+<HUMAN>your message</HUMAN>
+```
+
 ```yaml
 llm1:
   type: anthropic
@@ -98,6 +109,7 @@ llm2:
 rounds: 5
 output_file: output.json
 history_file: data/prompts/simulation.json
+human_in_the_loop: True
 ```
 
 ## Credit
