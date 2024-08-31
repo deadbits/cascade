@@ -1,7 +1,9 @@
 # cascade
+
 Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama) and an optional human-in-the-loop
 
 ## Installation 🛠️
+
 ```bash
 git clone https://github.com/deadbits/cascade.git
 cd cascade
@@ -10,8 +12,14 @@ pyenv activate cascade
 pip install -r requirements.txt
 ```
 
-* Make sure Ollama is running if you're using it for inference
-* If using OpenAI/Anthropic, set your API keys with environment variables `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`
+* Make sure Ollama is running if you're using it for inference.
+* If using OpenAI/Anthropic, set your API keys in a `.env` file:
+
+_cascade/.env_
+```
+ANTHROPIC_API_KEY=foo
+OPENAI_API_KEY=foo
+```
 
 ## Usage 🚀
 
@@ -71,7 +79,8 @@ If you add a message, it'll be appended with the format below.
 
 ## Examples
 
-**Claude and Mixtral**  
+**Claude and Mixtral** 
+
 ```yaml
 llm1:
   type: anthropic
@@ -84,7 +93,8 @@ output_file: output.json
 history_file: path/to/chat.json
 ```
 
-**Run a [virtual CLI simulation](https://twitter.com/AndyAyrey/status/1769942282168664104) between Anthropic and OpenAI**  
+**Run a [virtual CLI simulation](https://twitter.com/AndyAyrey/status/1769942282168664104) between Anthropic and OpenAI**
+
 ```yaml
 llm1:
   type: anthropic
@@ -98,6 +108,7 @@ history_file: data/prompts/simulation.json
 ```
 
 **Chat with human-in-the-loop**
+
 ```yaml
 llm1:
   type: anthropic
@@ -112,5 +123,6 @@ human_in_the_loop: True
 ```
 
 ## Credit
+
 Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for inspiration and [original code and prompt](https://www.codedump.xyz/py/ZfkQmMk8I7ecLbIk).  
 Check out [his project here](https://dreams-of-an-electric-mind.webflow.io/).
