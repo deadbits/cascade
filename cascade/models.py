@@ -1,6 +1,6 @@
 """Models for Cascade."""
-from typing import List, Dict, Optional
-from pydantic import BaseModel, model_validator
+from typing import List, Dict, Optional, Union
+from pydantic import BaseModel, model_validator, Field
 
 
 class Message(BaseModel):
@@ -14,7 +14,7 @@ class Conversation(BaseModel):
 
 class LLMConfig(BaseModel):
     """LLM config."""
-    type: str
+    connection: str
     system_prompt_file: str
 
 class Config(BaseModel):

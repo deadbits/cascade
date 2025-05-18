@@ -34,13 +34,13 @@ python main.py --config data/config.yaml
 Modify the config file `data/config.yaml` or create your own with the following structure:
 
 ```yaml
-# LLM type options: anthropic, openai, ollama:*
+# LLM connection string options: anthropic:claude-3-opus-20240229, openai:gpt-4-1106-preview, ollama:dolphin-mixtral
 llm1:
-  type: anthropic
+  connection: anthropic:claude-3-opus-20240229
   system_prompt_file: path/to/system_prompt1.txt
 
 llm2:
-  type: openai
+  connection: openai:gpt-4-1106-preview
   system_prompt_file: path/to/system_prompt2.txt
 
 # Conversation Settings
@@ -61,6 +61,13 @@ human_in_the_loop: False
 #  - role: assistant
 #    content: "I'm doing well, thank you for asking. How can I assist you today?"
 ```
+
+**Connection string format:**
+- For Anthropic: `anthropic:claude-3-opus-20240229`
+- For OpenAI: `openai:gpt-4-1106-preview`
+- For Ollama: `ollama:dolphin-mixtral`
+
+*The provider and model are separated by a colon. Only the `connection` and `system_prompt_file` fields are required for each LLM.*
 
 * `history_file` takes a JSON file containing the conversation history
 * For an example conversation history, see [data/prompts/simulation.json](data/prompts/simulation.json)
@@ -84,10 +91,10 @@ If you add a message, it'll be appended with the format below.
 
 ```yaml
 llm1:
-  type: anthropic
+  connection: anthropic:claude-3-opus-20240229
   system_prompt_file: path/to/prompt.txt
 llm2:
-  type: ollama:dolphin-mixtral
+  connection: ollama:dolphin-mixtral
   system_prompt_file: path/to/prompt.txt
 rounds: 5
 output_file: output.json
@@ -98,10 +105,10 @@ history_file: path/to/chat.json
 
 ```yaml
 llm1:
-  type: anthropic
+  connection: anthropic:claude-3-opus-20240229
   system_prompt_file: data/prompts/simulation.txt
 llm2:
-  type: openai
+  connection: openai:gpt-4-1106-preview
   system_prompt_file: data/prompts/simulation.txt
 rounds: 5
 output_file: output.json
@@ -112,10 +119,10 @@ history_file: data/prompts/simulation.json
 
 ```yaml
 llm1:
-  type: anthropic
+  connection: anthropic:claude-3-opus-20240229
   system_prompt_file: data/prompts/guided-chat.txt
 llm2:
-  type: anthropic
+  connection: anthropic:claude-3-5-sonnet-20241022
   system_prompt_file: data/prompts/guided-chat.txt
 rounds: 5
 output_file: output.json
