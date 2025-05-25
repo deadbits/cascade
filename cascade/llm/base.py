@@ -17,7 +17,7 @@ class BaseLLMWrapper(ABC):
             model: The model identifier to use
         """
         self.model = model
-        self.name = None
+        self.name = self.__class__.__name__.replace("Wrapper", "").lower()
 
     @abstractmethod
     def generate_stream(

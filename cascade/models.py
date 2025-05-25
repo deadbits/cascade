@@ -3,6 +3,7 @@
 from typing import List, Dict, Optional
 from enum import Enum
 from pydantic import BaseModel, model_validator, field_validator
+import os
 
 
 class Provider(str, Enum):
@@ -40,8 +41,10 @@ class LLMConfig(BaseModel):
         provider, model = v.split(":", 1)
         if not provider or not model:
             raise ValueError("Both provider and model must be specified")
-        if provider not in ["anthropic", "openai", "ollama"]:
-            raise ValueError("Provider must be one of: anthropic, openai, ollama")
+        try:
+            Provider(provider)
+        except ValueError:
+            raise ValueError(f"Provider must be one of: {[p.value for p in Provider]}")
         return v
 
     @property
@@ -53,6 +56,16 @@ class LLMConfig(BaseModel):
     def model(self) -> str:
         """Get the model from the connection string."""
         return self.connection.split(":", 1)[1]
+
+    def require_api_key(self):
+        """Ensure the required API key is present in the environment for providers that need it."""
+        env_vars = {
+            "openai": "OPENAI_API_KEY",
+            "anthropic": "ANTHROPIC_API_KEY",
+        }
+        env_var = env_vars.get(self.provider)
+        if env_var and not os.environ.get(env_var):
+            raise ValueError(f"{env_var} must be set in the environment for provider '{self.provider}'")
 
 
 class Config(BaseModel):

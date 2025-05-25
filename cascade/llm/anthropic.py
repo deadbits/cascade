@@ -12,20 +12,15 @@ from cascade.llm.base import BaseLLMWrapper
 class AnthropicWrapper(BaseLLMWrapper):
     """Wrapper for the Anthropic API."""
 
-    def __init__(self, model: str):
+    def __init__(self, model: str, api_key: str):
         """Initialize the Anthropic wrapper.
 
         Args:
             model: The model identifier to use
+            api_key: The Anthropic API key
         """
         super().__init__(model)
-        self.name = "anthropic"
-        if os.environ.get("ANTHROPIC_API_KEY"):
-            self.client = anthropic.Anthropic(
-                api_key=os.environ.get("ANTHROPIC_API_KEY")
-            )
-        else:
-            raise ValueError("Anthropic API key not found")
+        self.client = anthropic.Anthropic(api_key=api_key)
 
     def generate_stream(
         self, messages, system_prompt=None

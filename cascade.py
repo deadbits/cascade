@@ -48,8 +48,8 @@ if __name__ == "__main__":
     )
 
     llm_wrappers = {
-        "llm1": LLMFactory.create(config.llm1.provider, config.llm1.model),
-        "llm2": LLMFactory.create(config.llm2.provider, config.llm2.model)
+        "llm1": LLMFactory.create(config.llm1),
+        "llm2": LLMFactory.create(config.llm2)
     }
 
     state_manager = StateManager(config)

@@ -18,7 +18,6 @@ class OllamaWrapper(BaseLLMWrapper):
             model: The model identifier to use
         """
         super().__init__(model)
-        self.name = "ollama"
 
     def generate_stream(
         self, messages, system_prompt=None

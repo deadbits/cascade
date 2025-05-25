@@ -18,18 +18,15 @@ from cascade.llm.base import BaseLLMWrapper
 class OpenAIWrapper(BaseLLMWrapper):
     """Wrapper for OpenAI API"""
 
-    def __init__(self, model: str):
+    def __init__(self, model: str, api_key: str):
         """Initialize the OpenAI wrapper.
 
         Args:
             model: The model identifier to use
+            api_key: The OpenAI API key
         """
         super().__init__(model)
-        self.name = "openai"
-        if os.environ.get("OPENAI_API_KEY"):
-            self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        else:
-            raise ValueError("OpenAI API key not found in environment variables")
+        self.client = OpenAI(api_key=api_key)
 
     def generate_stream(
         self, messages, system_prompt=None
