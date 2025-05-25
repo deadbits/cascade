@@ -72,12 +72,11 @@ if __name__ == "__main__":
     )
 
     llm_wrappers = initialize_llm_wrappers(config)
-    state_manager = StateManager(config, config_dir)
+    state_manager = StateManager(config)
     display_manager = DisplayManager()
 
     orchestrator = ConversationOrchestrator(
         conf=config,
-        conf_dir=config_dir,
         llm_wrappers=llm_wrappers,
         state_manager=state_manager,
         display_manager=display_manager,

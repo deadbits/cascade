@@ -21,13 +21,11 @@ class ConversationOrchestrator:
     def __init__(
         self,
         conf: Config,
-        conf_dir: str,
         llm_wrappers: Dict[str, BaseLLMWrapper],
         state_manager: StateManager,
         display_manager: DisplayManager,
     ):
         self.conf = conf
-        self.conf_dir = conf_dir
         self.llm_wrappers = llm_wrappers
         self.state_manager = state_manager
         self.display_manager = display_manager
@@ -38,12 +36,11 @@ class ConversationOrchestrator:
         prompts = {}
         for llm_key in ["llm1", "llm2"]:
             llm_config = getattr(self.conf, llm_key)
-            file_path = os.path.join(self.conf_dir, llm_config.system_prompt_file)
             try:
-                with open(file_path, "r", encoding="utf-8") as fp:
+                with open(llm_config.system_prompt_file, "r", encoding="utf-8") as fp:
                     prompts[llm_key] = fp.read()
             except FileNotFoundError:
-                logger.error(f"System prompt file not found: {file_path}")
+                logger.error(f"System prompt file not found: {llm_config.system_prompt_file}")
                 raise
         return prompts
 

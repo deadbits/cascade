@@ -45,9 +45,8 @@ class ConversationPair:
 class StateManager:
     """Manages conversation state."""
 
-    def __init__(self, conf: Config, conf_dir: str):
+    def __init__(self, conf: Config):
         self.conf = conf
-        self.conf_dir = conf_dir
         self.conversation_pair = self._initialize_conversations()
         self.output_data = {
             "llm1": [],
@@ -69,7 +68,7 @@ class StateManager:
         if self.conf.history_file:
             try:
                 with open(
-                    os.path.join(self.conf_dir, self.conf.history_file),
+                    os.path.join(self.conf.history_file),
                     "r",
                     encoding="utf-8",
                 ) as fp:
@@ -93,7 +92,7 @@ class StateManager:
 
         if self.conf.output_file:
             with open(
-                os.path.join(self.conf_dir, self.conf.output_file),
+                os.path.join(self.conf.output_file),
                 "w",
                 encoding="utf-8",
             ) as f:
