@@ -52,33 +52,18 @@ history_file: path/to/conversation_history.json
 
 # Optional added to chat with <HUMAN> tag
 human_in_the_loop: False
-
-# Or conversation history in YAML format
-# Better for short conversations / quick tests
-# history:
-#  - role: user
-#    content: "Hello, how are you?"
-#  - role: assistant
-#    content: "I'm doing well, thank you for asking. How can I assist you today?"
 ```
-
-**Connection string format:**
-- For Anthropic: `anthropic:claude-3-opus-20240229`
-- For OpenAI: `openai:gpt-4-1106-preview`
-- For Ollama: `ollama:dolphin-mixtral`
-
-*The provider and model are separated by a colon. Only the `connection` and `system_prompt_file` fields are required for each LLM.*
 
 * `history_file` takes a JSON file containing the conversation history
 * For an example conversation history, see [data/prompts/simulation.json](data/prompts/simulation.json)
-* You can optionally specify a short conversation history directly in the YAML file using the `history` key
 
-**Human-in-the-loop**
+### Human-in-the-loop
 
 When running in this mode, you'll see `msg ($LLM_NAME): ` in between messages sent to/from the LLMs.
 You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
 
-If you add a message, it'll be appended with the format below. 
+If you add a message, it'll be appended with the format below.
+
 **It is up to you to use a system prompt or conversation history that handles this appropriately.**
 
 ```xml
@@ -87,7 +72,7 @@ If you add a message, it'll be appended with the format below.
 
 ## Examples
 
-**Claude and Mixtral** 
+**Claude and Mixtral**
 
 ```yaml
 llm1:
@@ -99,35 +84,6 @@ llm2:
 rounds: 5
 output_file: output.json
 history_file: path/to/chat.json
-```
-
-**Run a [virtual CLI simulation](https://twitter.com/AndyAyrey/status/1769942282168664104) between Anthropic and OpenAI**
-
-```yaml
-llm1:
-  connection: anthropic:claude-3-opus-20240229
-  system_prompt_file: data/prompts/simulation.txt
-llm2:
-  connection: openai:gpt-4-1106-preview
-  system_prompt_file: data/prompts/simulation.txt
-rounds: 5
-output_file: output.json
-history_file: data/prompts/simulation.json
-```
-
-**Chat with human-in-the-loop**
-
-```yaml
-llm1:
-  connection: anthropic:claude-3-opus-20240229
-  system_prompt_file: data/prompts/guided-chat.txt
-llm2:
-  connection: anthropic:claude-3-5-sonnet-20241022
-  system_prompt_file: data/prompts/guided-chat.txt
-rounds: 5
-output_file: output.json
-history_file: data/prompts/simulation.json
-human_in_the_loop: True
 ```
 
 ## Credit

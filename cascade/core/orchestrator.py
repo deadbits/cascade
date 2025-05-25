@@ -54,7 +54,7 @@ class ConversationOrchestrator:
                 llm_config = getattr(self.conf, llm_key)
                 human_message = self.display_manager.display_human_prompt(llm_config)
                 conversation = (
-                    self.state_manager.conversation_pair.get_llm_conversation(llm_key)
+                    self.state_manager.conversation_pair.get_conversation(llm_key)
                 )
                 conversation.messages[
                     -1
@@ -75,7 +75,7 @@ class ConversationOrchestrator:
         with Live(panel, refresh_per_second=4) as live:
             try:
                 conversation = (
-                    self.state_manager.conversation_pair.get_llm_conversation(llm_key)
+                    self.state_manager.conversation_pair.get_conversation(llm_key)
                 )
                 for chunk in self.llm_wrappers[llm_key].generate_stream(
                     conversation.messages, self.sys_prompts[llm_key]

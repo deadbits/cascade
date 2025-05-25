@@ -1,10 +1,11 @@
 """Conversation manager."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Dict
 import os
 import json
-from loguru import logger
 import datetime
+from loguru import logger
 
 from cascade.models import (
     Conversation,
@@ -15,33 +16,31 @@ from cascade.models import (
 
 @dataclass
 class ConversationPair:
-    """A pair of conversations between two LLMs."""
+    """Simplified conversation pair management."""
+    
+    conversations: Dict[str, Conversation] = field(default_factory=dict)
+    
+    def __post_init__(self):
+        if not self.conversations:
+            self.conversations = {
+                "llm1": Conversation(messages=[]),
+                "llm2": Conversation(messages=[])
+            }
 
-    llm1: str
-    llm2: str
-    conversation1: Conversation
-    conversation2: Conversation
-
-    def get_llm_conversation(self, llm_key: str) -> Conversation:
-        """Get the conversation for a specific LLM."""
-        return self.conversation1 if llm_key == self.llm1 else self.conversation2
-
-    def get_other_llm_key(self, llm_key: str) -> str:
-        """Get the key of the other LLM."""
-        return self.llm2 if llm_key == self.llm1 else self.llm1
-
-    def add_message(self, llm_key: str, message: Message) -> None:
-        """Add a message to the conversation and mirror it to the other side."""
-        self.get_llm_conversation(llm_key).messages.append(message)
-
-        # Mirror to the other conversation with opposite role
-        other_llm_key = self.get_other_llm_key(llm_key)
-        other_message = Message(
+    def add_message(self, sender: str, message: Message) -> None:
+        """Add a message and mirror it to the other conversation."""
+        self.conversations[sender].messages.append(message)
+        
+        receiver = "llm2" if sender == "llm1" else "llm1"
+        mirrored_message = Message(
             role="user" if message.role == "assistant" else "assistant",
-            content=message.content,
+            content=message.content
         )
-        self.get_llm_conversation(other_llm_key).messages.append(other_message)
-
+        self.conversations[receiver].messages.append(mirrored_message)
+    
+    def get_conversation(self, llm_key: str) -> Conversation:
+        """Get conversation for a specific LLM."""
+        return self.conversations[llm_key]
 
 class StateManager:
     """Manages conversation state."""
@@ -59,10 +58,10 @@ class StateManager:
         """Initialize conversation history."""
         conv_1 = self._load_conversation_history()
         return ConversationPair(
-            llm1="llm1",
-            llm2="llm2",
-            conversation1=conv_1,
-            conversation2=Conversation(messages=[]),
+            conversations={
+                "llm1": conv_1,
+                "llm2": Conversation(messages=[]),
+            }
         )
 
     def _load_conversation_history(self) -> Conversation:

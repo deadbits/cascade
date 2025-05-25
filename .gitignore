@@ -1,7 +1,5 @@
-# application specific
 data/logs/*.json
 
-# MacOS
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
