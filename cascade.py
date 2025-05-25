@@ -2,10 +2,6 @@
 ˚. ✦.˳·˖✶ ⋆.✧̣̇˚.
 ~ cascade.py ~
 ˚. ✦.˳·˖✶ ⋆.✧̣̇˚.
-
-Start a conversation between two LLM instances
-
-Set API keys with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`
 """
 
 import os
