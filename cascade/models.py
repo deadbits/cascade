@@ -1,7 +1,15 @@
 """Models for Cascade."""
 
 from typing import List, Dict, Optional
+from enum import Enum
 from pydantic import BaseModel, model_validator, field_validator
+
+
+class Provider(str, Enum):
+    """Supported LLM providers."""
+    ANTHROPIC = "anthropic"
+    OPENAI = "openai"
+    OLLAMA = "ollama"
 
 
 class Message(BaseModel):

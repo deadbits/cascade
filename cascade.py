@@ -7,40 +7,16 @@
 import os
 import sys
 import argparse
-from typing import Dict
 
 import yaml
 from loguru import logger
 from pydantic import ValidationError
 
-from cascade.llm.base import BaseLLMWrapper
-from cascade.llm.anthropic import AnthropicWrapper
-from cascade.llm.openai import OpenAIWrapper
-from cascade.llm.ollama import OllamaWrapper
+from cascade.llm.factory import LLMFactory
 from cascade.models import Config
 from cascade.core.orchestrator import ConversationOrchestrator
 from cascade.core.conversation import StateManager
 from cascade.core.display import DisplayManager
-
-
-def initialize_llm_wrappers(conf: Config) -> Dict[str, BaseLLMWrapper]:
-    """Initialize LLM wrappers based on configuration."""
-    wrappers = {}
-    for llm_key in ["llm1", "llm2"]:
-        llm_config = getattr(conf, llm_key)
-        provider = llm_config.provider
-        model = llm_config.model
-
-        if provider == "anthropic":
-            wrappers[llm_key] = AnthropicWrapper(model=model)
-        elif provider == "openai":
-            wrappers[llm_key] = OpenAIWrapper(model=model)
-        elif provider == "ollama":
-            wrappers[llm_key] = OllamaWrapper(model=model)
-        else:
-            raise ValueError(f"Invalid LLM provider: {provider}")
-
-    return wrappers
 
 
 def load_config(config_file: str) -> tuple[Config, str]:
@@ -71,7 +47,11 @@ if __name__ == "__main__":
         f"Starting conversation: {config.llm1.connection} ⇄ {config.llm2.connection}"
     )
 
-    llm_wrappers = initialize_llm_wrappers(config)
+    llm_wrappers = {
+        "llm1": LLMFactory.create(config.llm1.provider, config.llm1.model),
+        "llm2": LLMFactory.create(config.llm2.provider, config.llm2.model)
+    }
+
     state_manager = StateManager(config)
     display_manager = DisplayManager()
 
