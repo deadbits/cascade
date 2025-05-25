@@ -12,29 +12,25 @@ pyenv activate cascade
 pip install -r requirements.txt
 ```
 
-* Make sure Ollama is running if you're using it for inference.
-* If using OpenAI/Anthropic, set your API keys in a `.env` file:
+* If using OpenAI/Anthropic, set your API keys as environment variables.
 
-_cascade/.env_
 ```
 ANTHROPIC_API_KEY=foo
 OPENAI_API_KEY=foo
 ```
 
-## Usage 🚀
-
-The application now uses a YAML configuration file for easier setup and reusability.
+## Usage
 
 ```bash
 python main.py --config data/config.yaml
 ```
 
-### YAML Configuration
+### Configuration
 
 Modify the config file `data/config.yaml` or create your own with the following structure:
 
 ```yaml
-# LLM connection string options: anthropic:claude-3-opus-20240229, openai:gpt-4-1106-preview, ollama:dolphin-mixtral
+# LLM connection string: anthropic:claude-3-opus-20240229, openai:gpt-4-1106-preview, ollama:dolphin-mixtral
 llm1:
   connection: anthropic:claude-3-opus-20240229
   system_prompt_file: path/to/system_prompt1.txt
@@ -68,22 +64,6 @@ If you add a message, it'll be appended with the format below.
 
 ```xml
 <HUMAN>your message</HUMAN>
-```
-
-## Examples
-
-**Claude and Mixtral**
-
-```yaml
-llm1:
-  connection: anthropic:claude-3-opus-20240229
-  system_prompt_file: path/to/prompt.txt
-llm2:
-  connection: ollama:dolphin-mixtral
-  system_prompt_file: path/to/prompt.txt
-rounds: 5
-output_file: output.json
-history_file: path/to/chat.json
 ```
 
 ## Credit
