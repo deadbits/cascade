@@ -52,6 +52,11 @@ class StateManager:
             "llm1": [],
             "llm2": [],
         }
+        self.output_file = None
+        if self.conf.output_file:
+            base, ext = os.path.splitext(self.conf.output_file)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            self.output_file = f"{base}-{timestamp}{ext}"
 
     def _initialize_conversations(self) -> ConversationPair:
         """Initialize conversation history."""
@@ -90,9 +95,9 @@ class StateManager:
         msg_dict["timestamp"] = datetime.datetime.utcnow().isoformat() + "Z"
         self.output_data[llm_key].append(msg_dict)
 
-        if self.conf.output_file:
+        if self.output_file:
             with open(
-                os.path.join(self.conf.output_file),
+                os.path.join(self.output_file),
                 "w",
                 encoding="utf-8",
             ) as f:
