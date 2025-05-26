@@ -16,7 +16,7 @@ from cascade.models import (
 
 @dataclass
 class ConversationPair:
-    """Simplified conversation pair management."""
+    """Conversation pair management."""
     
     conversations: Dict[str, Conversation] = field(default_factory=dict)
     
