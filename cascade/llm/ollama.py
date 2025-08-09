@@ -23,6 +23,7 @@ class OllamaWrapper(BaseLLMWrapper):
         self, messages, system_prompt=None
     ) -> Generator[str, None, None]:
         """Generate a streaming response."""
+        messages = [msg.model_dump() for msg in messages]
         if system_prompt:
             messages.insert(0, {"role": "system", "content": system_prompt})
 

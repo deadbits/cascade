@@ -45,7 +45,7 @@ class ConfigLoader:
                 raise FileNotFoundError(f"System prompt file not found: {prompt_file}") from exc
 
     def load_messages(self):
-        """Load the messages from the configuration."""
+        """Load the messages from the configuration as a single list."""
         if self.conf.history_file:
             history_file_path = os.path.join(self.config_dir, self.conf.history_file)
             try:
