@@ -1,7 +1,6 @@
 """Orchestrator."""
 
 from typing import Dict
-import os
 
 from loguru import logger
 from rich.live import Live
@@ -95,3 +94,5 @@ class ConversationOrchestrator:
                 response = self._generate_response(llm_key, round_num)
                 new_message = Message(role="assistant", content=response)
                 self.state_manager.append_message(llm_key, new_message)
+
+        logger.info(f"Conversation saved to {self.state_manager.output_file}")
