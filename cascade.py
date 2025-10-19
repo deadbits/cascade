@@ -43,9 +43,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     config, config_dir = load_config(args.config)
-    logger.info(
-        f"Starting conversation: {config.llm1.connection} ⇄ {config.llm2.connection}"
-    )
 
     llm_wrappers = {
         "llm1": LLMFactory.create(config.llm1),
