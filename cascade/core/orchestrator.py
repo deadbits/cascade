@@ -62,11 +62,10 @@ class ConversationOrchestrator:
     def _generate_response(self, llm_key: str, round_num: int) -> str:
         """Generate a response from an LLM."""
         response = ""
-        color = "blue" if llm_key == "llm1" else "green"
         markdown_content = ""
 
         llm_config = getattr(self.conf, llm_key)
-        panel = self.display_manager.create_response_panel(llm_config, round_num, color)
+        panel = self.display_manager.create_response_panel(llm_config, round_num, llm_key)
 
         with Live(panel, refresh_per_second=4) as live:
             try:
@@ -79,6 +78,10 @@ class ConversationOrchestrator:
                     response += chunk
                     markdown_content += chunk
                     self.display_manager.update_panel(panel, markdown_content, live)
+
+                token_count = len(response.split())
+                self.display_manager.finalize_panel(panel, llm_config, round_num, llm_key, token_count)
+                live.update(panel)
             except Exception as ex:
                 logger.error(f"Error generating response: {str(ex)}")
                 raise
@@ -87,7 +90,15 @@ class ConversationOrchestrator:
 
     def converse(self) -> None:
         """Start the conversation between LLMs."""
+        self.display_manager.display_conversation_header(
+            self.conf.llm1.connection,
+            self.conf.llm2.connection,
+            self.conf.rounds
+        )
+
         for round_num in range(1, self.conf.rounds + 1):
+            self.display_manager.display_round_separator(round_num)
+
             for llm_key in ["llm1", "llm2"]:
                 self._process_human_input(llm_key)
 
@@ -95,4 +106,6 @@ class ConversationOrchestrator:
                 new_message = Message(role="assistant", content=response)
                 self.state_manager.append_message(llm_key, new_message)
 
-        logger.info(f"Conversation saved to {self.state_manager.output_file}")
+                self.display_manager.add_panel_spacing()
+
+        self.display_manager.display_completion_message(self.state_manager.output_file)
