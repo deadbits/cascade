@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from loguru import logger
 
-from cascade.models import Config, Message
+from .models import Config, Message
 
 
 class ConfigLoader:

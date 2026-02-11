@@ -2,26 +2,29 @@
 
 Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama) and an optional human-in-the-loop
 
-## Installation
+## Quick Start
+
+### Install
 
 ```bash
 git clone https://github.com/deadbits/cascade.git
 cd cascade
-pyenv virtualenv 3.11.7 cascade
-pyenv activate cascade
-pip install -r requirements.txt
+uv sync
 ```
 
-## Configuration
+### Configuration
 
-### API Keys
-If using OpenAI/Anthropic, set your API keys as environment variables:
+**API keys:**
+
+Set [LLM provider](https://ai.pydantic.dev/models/overview/) API keys as environment variables:
+
 ```
-export ANTHROPIC_API_KEY=foo
-export OPENAI_API_KEY=foo
+export ANTHROPIC_API_KEY=...
+export OPENAI_API_KEY=...
 ```
 
-### YAML Config
+**YAML config:**
+
 Modify the config file `data/config.yaml` or create your own with the following structure:
 
 ```yaml
@@ -48,17 +51,15 @@ human_in_the_loop: False
 * `history_file` takes a JSON file containing the conversation history
 * For an example conversation history, see [data/prompts/simulation.json](data/prompts/simulation.json)
 
-
-## Usage
+### Running
 
 ```bash
-python main.py --config data/config.yaml
+uv run cascade --config data/config.yaml
 ```
 
-### Human-in-the-loop
+## Human-in-the-loop
 
-When running in this mode, you'll see `msg ($LLM_NAME): ` in between messages sent to/from the LLMs.
-You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
+When running in this mode, you'll see `msg ($LLM_NAME):` in between messages sent to/from the LLMs. You can optionally add your own message to the chat here, or press Ctrl+C to skip that round.
 
 If you add a message, it'll be appended with the format below.
 
@@ -70,5 +71,5 @@ If you add a message, it'll be appended with the format below.
 
 ## Credit
 
-Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for inspiration and [original code and prompt](https://www.codedump.xyz/py/ZfkQmMk8I7ecLbIk).  
+Credit to [Andy Ayrey](https://twitter.com/AndyAyrey/status/1769942282168664104) for inspiration.  
 Check out [his project here](https://dreams-of-an-electric-mind.webflow.io/).
