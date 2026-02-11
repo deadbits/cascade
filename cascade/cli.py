@@ -1,10 +1,10 @@
 """
 ˚. ✦.˳·˖✶ ⋆.✧̣̇˚.
-~ cascade.py ~
+~ cascade cli ~
 ˚. ✦.˳·˖✶ ⋆.✧̣̇˚.
 """
 
-import os
+import asyncio
 import sys
 import argparse
 
@@ -12,26 +12,25 @@ import yaml
 from loguru import logger
 from pydantic import ValidationError
 
-from cascade.llm.factory import LLMFactory
-from cascade.models import Config
-from cascade.core.orchestrator import ConversationOrchestrator
-from cascade.core.conversation import StateManager
-from cascade.core.display import DisplayManager
+from .agent import create_agent
+from .models import Config
+from .core.orchestrator import ConversationOrchestrator
+from .core.conversation import StateManager
+from .core.display import DisplayManager
 
 
-def load_config(config_file: str) -> tuple[Config, str]:
-    """Load the configuration file."""
-    config_dir = os.path.dirname(os.path.abspath(config_file))
+def load_config(config_file: str) -> Config:
+    """Load and validate the YAML configuration file."""
     with open(config_file, "r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
     try:
-        return Config(**config_data), config_dir
+        return Config(**config_data)
     except ValidationError as validation_err:
         logger.error(f"Invalid configuration: {validation_err}")
         sys.exit(1)
 
 
-if __name__ == "__main__":
+async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c",
@@ -42,28 +41,42 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    config, config_dir = load_config(args.config)
-
-    llm_wrappers = {
-        "llm1": LLMFactory.create(config.llm1),
-        "llm2": LLMFactory.create(config.llm2)
-    }
+    config = load_config(args.config)
+    config.llm1.require_api_key()
+    config.llm2.require_api_key()
 
     state_manager = StateManager(config)
     display_manager = DisplayManager()
 
+    agents = {
+        "llm1": create_agent(
+            config.llm1.connection, state_manager.system_prompts["llm1"]
+        ),
+        "llm2": create_agent(
+            config.llm2.connection, state_manager.system_prompts["llm2"]
+        ),
+    }
+
     orchestrator = ConversationOrchestrator(
         conf=config,
-        llm_wrappers=llm_wrappers,
+        agents=agents,
         state_manager=state_manager,
         display_manager=display_manager,
     )
 
     try:
-        orchestrator.converse()
+        await orchestrator.converse()
     except KeyboardInterrupt:
         logger.error("Conversation interrupted by user")
         sys.exit(1)
     except Exception as err:
         logger.error(f"An error occurred: {err}")
         sys.exit(1)
+
+
+def entrypoint() -> None:
+    asyncio.run(main())
+
+
+if __name__ == "__main__":
+    entrypoint()

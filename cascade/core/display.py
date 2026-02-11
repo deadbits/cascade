@@ -8,7 +8,7 @@ from rich.live import Live
 from rich.text import Text
 from datetime import datetime
 
-from cascade.models import LLMConfig
+from ..models import LLMConfig
 
 
 class DisplayManager:

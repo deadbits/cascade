@@ -1,5 +1,0 @@
-openai==1.14.2
-anthropic==0.21.3
-ollama==0.1.7
-halo==0.0.31
-rich==12.6.0

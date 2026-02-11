@@ -1,0 +1,19 @@
+[project]
+name = "cascade"
+version = "0.1.0"
+description = "Facilitates a conversation between two LLMs (OpenAI, Anthropic, Ollama) and an optional human-in-the-loop"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-ai==1.56.0",
+    "rich>=14.3.2",
+    "pyyaml>=6.0.3",
+    "loguru>=0.7.3",
+]
+
+[project.scripts]
+cascade = "cascade.cli:entrypoint"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
